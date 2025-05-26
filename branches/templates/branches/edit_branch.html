@@ -1,0 +1,61 @@
+{% extends "branches/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">ویرایش اطلاعات شعبه: {{ branch.name }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+    <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+
+        {% if field.field.widget|default:''|stringformat:"s" == 'CheckboxSelectMultiple' %}
+            <div class="form-check">
+                {% for checkbox in field %}
+                    <div class="form-check">
+                        {{ checkbox.tag }}
+                        <label class="form-check-label">{{ checkbox.choice_label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ field }}
+        {% endif %}
+
+        {% if field.errors %}
+            <div class="form-text text-danger">
+                {{ field.errors }}
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-success">ذخیره</button>
+                    <a href="{% url 'branch_list' %}" class="btn btn-outline-secondary">بازگشت</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".datepicker").persianDatepicker({
+        format: "YYYY/MM/DD",
+        initialValueType: "gregorian",
+        calendarType: "persian",
+        autoClose: true
+    });
+</script>
+
+
+{% endblock %}

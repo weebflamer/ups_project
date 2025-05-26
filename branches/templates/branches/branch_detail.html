@@ -1,0 +1,109 @@
+{% extends "branches/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{% url 'edit_branch' branch.pk %}" class="btn btn-outline-primary">
+                     ویرایش اطلاعات
+                </a>
+                <h2 class="card-title text-primary m-0 text-center flex-grow-1">
+                    {{ branch.name }}
+                </h2>
+                <div style="width: 120px;"></div> <!-- برای تعادل چیدمان -->
+            </div>
+
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">شماره شعبه:</div>
+                <div class="col-8">{{ branch.branch_code }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">درجه:</div>
+                <div class="col-8">{{ branch.grade }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">تلفن:</div>
+                <div class="col-8">{{ branch.phone }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">برند (UPS):</div>
+                <div class="col-8">
+                    {% for brand in branch.ups_brand.all %}
+                        {{ brand.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %} ندارد {% endfor %}
+                </div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">توان (UPS):</div>
+                <div class="col-8">{{ branch.ups_power }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">تاریخ نصب:</div>
+                <div class="col-8">{{ branch.install_date }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">برند باتری:</div>
+                <div class="col-8">
+                    {% for battery in branch.battery_model.all %}
+                        {{ battery.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %} ندارد {% endfor %}
+                </div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">تعداد باتری:</div>
+                <div class="col-8">{{ branch.battery_count }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">میزان آمپر هر باتری:</div>
+                <div class="col-8">{{ branch.battery_amp }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">ولتاژ باتری:</div>
+                <div class="col-8">{{ branch.battery_voltage }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">مدت شارژدهی (دقیقه):</div>
+                <div class="col-8">{{ branch.charge_duration }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">سریال UPS:</div>
+                <div class="col-8">{{ branch.ups_serial }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">آدرس:</div>
+                <div class="col-8">{{ branch.address }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">کارشناس سداد:</div>
+                <div class="col-8">{{ branch.expert }}</div>
+            </div>
+            <div class="row mb-2 py-2 border-bottom">
+                <div class="col-4 text-muted">وضعیت باتری:</div>
+                <div class="col-8">{{ branch.battery_status }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-4 text-muted">تاریخ آخرین نصب باتری:</div>
+                <div class="col-8">{{ branch.last_battery_installed_date }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        {% if prev_branch %}
+            <a href="{% url 'branch_detail' prev_branch.pk %}" class="btn btn-outline-primary">« قبلی</a>
+        {% endif %}
+        {% if next_branch %}
+            <a href="{% url 'branch_detail' next_branch.pk %}" class="btn btn-outline-primary ms-auto">بعدی »</a>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+{% endblock %}
