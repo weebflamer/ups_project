@@ -5,15 +5,19 @@
     <title>{% block title %}مدیریت UPS{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css" rel="stylesheet">
-    <!-- Persian Datepicker CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 
-    <!-- jQuery -->
+
+
+    {# اضافه کردن CSS جدید JalaliDatePicker #}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'branches/jalali_datepicker/JalaliDatePicker.css' %}">
+
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
 
-    <!-- Persian Datepicker JS -->
-    <script src="https://cdn.jsdelivr.net/npm/persian-date@0.1.8/dist/persian-date.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+
+    {# اضافه کردن JS جدید JalaliDatePicker #}
+    <script src="{% static 'branches/jalali_datepicker/JalaliDatePicker.js' %}"></script>
 
 </head>
 <body>
@@ -31,21 +35,15 @@
     <footer class="text-center mt-5 mb-3 text-muted">
         <small>© مدیریت UPS - 2025</small>
     </footer>
-<script>
-    $(document).ready(function(){
-        $(".datepicker").persianDatepicker({
-            format: 'YYYY/MM/DD',
-            initialValueType: 'gregorian',
-            calendarType: 'persian',
-            autoClose: true,
-            toolbox: {
-                calendarSwitch: {
-                    enabled: false
-                }
-            }
-        });
-    });
-</script>
+
+
+
+
+    <script>
+
+        const jalali_datepicker = jalaliDatepicker.startWatch();
+
+    </script>
 
 </body>
 </html>

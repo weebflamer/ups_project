@@ -1,4 +1,5 @@
 from django.db import models
+import django_jalali.db.models as jmodels # Add this import
 
 class UPSBrand(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -18,8 +19,9 @@ class Branch(models.Model):
     expert = models.CharField(max_length=100, blank=True, null=True)
     ups_brand = models.ManyToManyField(UPSBrand, blank=True, verbose_name='برند UPS')
     ups_power = models.CharField(max_length=20, blank=True, null=True)
-    install_date = models.CharField(max_length=100, blank=True, null=True)
-    last_battery_installed_date = models.CharField(max_length=100, blank=True, null=True)
+    # Change these fields to jDateField
+    install_date = jmodels.jDateField(blank=True, null=True) # Changed
+    last_battery_installed_date = jmodels.jDateField(blank=True, null=True) # Changed
     battery_count = models.IntegerField(blank=True, null=True)
     battery_model = models.ManyToManyField(BatteryModel, blank=True, verbose_name='مدل باتری')
     battery_amp = models.CharField(max_length=20, blank=True, null=True)

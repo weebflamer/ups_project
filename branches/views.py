@@ -1,5 +1,6 @@
+# branches/views.py
 import os
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect  # redirect را اضافه کنید
 from django.db.models import Q
 from django.http import HttpResponse
 
@@ -12,11 +13,12 @@ import pandas as pd
 
 from .forms import UploadFileForm
 
-from jalali_date import datetime2jalali, date2jalali
-
+from jalali_date import datetime2jalali, date2jalali  # Keep these imports
+import jdatetime  # Add this import
+from datetime import datetime as dt  # Add this import
 
 import openpyxl
-
+from .models import Branch
 
 EXPECTED_COLUMNS = [
     'شماره شعبه', 'نام شعبه', 'درجه شعبه', 'تلفن', 'مدل ups', 'محل استفاده',
@@ -28,6 +30,100 @@ EXPECTED_COLUMNS = [
     'شماره تماس کارشناس شعبه', 'ملکی - استیجاری', 'کد پستی', 'آدرس', 'کارشناس'
 ]
 
+
+# تابع برای تبدیل امن به عدد صحیح (از import_branches.py کپی شده)
+def safe_int(val):
+    if val is None:
+        return None
+    if isinstance(val, float):
+        if math.isnan(val):
+            return None
+        return int(val)
+    if isinstance(val, int):
+        return val
+    try:
+        s_val = str(val).strip()
+        if s_val.endswith('.0') and s_val[:-2].isdigit():
+            return int(float(s_val))
+        if s_val.isdigit():
+            return int(s_val)
+    except (ValueError, TypeError):
+        pass
+    return None
+
+
+# تابع برای بررسی معتبر بودن مقدار سلول (از import_branches.py کپی شده)
+def is_valid(value):
+    if value is None:
+        return False
+    if isinstance(value, float) and math.isnan(value):
+        return False
+    if isinstance(value, (int, float)):
+        return True
+    return str(value).strip() != ''
+
+
+# تابع برای تبدیل رشته تاریخ به آبجکت jdatetime.date (از import_branches.py کپی شده)
+def convert_to_date_object(date_value):
+    if not is_valid(date_value):
+        return None
+
+    s = str(date_value).strip()
+
+    # Handle float representation from Excel (e.g., '2023.0', '1402.0')
+    if s.endswith('.0') and s[:-2].isdigit():
+        s = s[:-2]  # Remove '.0' suffix for integer years
+
+    # Try to parse as integer year first (e.g., '2023', '1402')
+    if s.isdigit():
+        year_int = int(s)
+        if year_int > 1500:  # Likely Gregorian year (e.g., 1900-2100)
+            try:
+                g_date_obj = dt(year_int, 1, 1).date()
+                return jdatetime.date.fromgregorian(date=g_date_obj)  # Return jdate object
+            except ValueError:
+                pass
+        elif year_int < 1500 and year_int > 1000:  # Likely Shamsi year
+            try:
+                return jdatetime.date(year_int, 1, 1)  # Return jdate object
+            except ValueError:
+                pass
+
+    # Try parsing as a full Shamsi date string (e.g., '1402/05/10')
+    try:
+        return jdatetime.date.strptime(s, '%Y/%m/%d')  # Return jdate object
+    except AttributeError:
+        print(f"Warning: jdatetime.date.strptime is not available for '{s}'. Trying alternative parse.")
+        try:
+            g_date_obj = dt.strptime(s, '%Y/%m/%d').date()
+            return jdatetime.date.fromgregorian(date=g_date_obj)  # Return jdate object
+        except ValueError:
+            pass
+    except ValueError:
+        pass
+
+    # Try parsing as a full Gregorian date string (e.g., '2023-05-15', '2023/05/15')
+    try:
+        g_date_obj = dt.strptime(s, '%Y-%m-%d').date()
+        return jdatetime.date.fromgregorian(date=g_date_obj)  # Return jdate object
+    except ValueError:
+        try:
+            g_date_obj = dt.strptime(s, '%Y/%m/%d').date()
+            return jdatetime.date.fromgregorian(date=g_date_obj)  # Return jdate object
+        except ValueError:
+            pass
+
+    # If all parsing attempts fail, return None
+    print(f"Warning: Could not convert '{s}' to a valid date object. Storing as None.")
+    return None
+
+
+def delete_branch(request, pk):
+    branch = get_object_or_404(Branch, pk=pk)
+    if request.method == 'POST':
+        branch.delete()
+        return redirect('branch_list')
+    return render(request, 'branches/confirm_delete.html', {'branch': branch})
 
 
 def branch_detail(request, pk):
@@ -41,6 +137,8 @@ def branch_detail(request, pk):
         'next_branch': next_branch,
         'prev_branch': prev_branch
     })
+
+
 def branch_list(request):
     branches = Branch.objects.all()
     return render(request, 'branches/branch_list.html', {'branches': branches})
@@ -62,11 +160,11 @@ def add_branch(request):
     if request.method == 'POST':
         form = BranchForm(request.POST)
         if form.is_valid():
-            form.save()
-            return render(request, 'add_branch.html', {'form': form, 'title': 'افزودن شعبه جدید'})
-
+            branch = form.save()  # شعبه را ذخیره کنید
+            return redirect('branch_detail', pk=branch.pk)  # به جزئیات شعبه جدید هدایت کنید
     else:
         form = BranchForm()
+    # این خط برای درخواست GET یا در صورت نامعتبر بودن فرم است
     return render(request, 'branches/add_branch.html', {'form': form})
 
 
@@ -102,15 +200,20 @@ def upload_excel(request):
                 })
 
             for _, row in df.iterrows():
+                install_date_obj = convert_to_date_object(row['تاریخ راه اندازی و نصب UPS'])
+                last_battery_date_obj = convert_to_date_object(row['تاریخ آخرین نصب باطری'])
+
                 Branch.objects.create(
                     branch_code=str(row["شماره شعبه"]),
                     name=row["نام شعبه"],
                     grade=row.get("درجه شعبه"),
                     phone=row.get("تلفن"),
                     ups_power=row.get("توان UPS(KVA )"),
-                    install_date=row.get("تاریخ راه اندازی و نصب UPS"),
-                    battery_count=row.get("تعداد باطری نصب شده"),
-                    battery_model=row.get("مدل و برند باطری"),
+                    install_date=install_date_obj,  # Pass date object
+                    last_battery_installed_date=last_battery_date_obj,  # Pass date object
+                    battery_count=safe_int(row.get("تعداد باطری نصب شده")),
+                    # Assuming battery_model column is handled later as ManyToMany
+                    # if not, it should be adjusted based on models.py
                     battery_amp=row.get("میزان آمپر هر باطری"),
                     battery_voltage=row.get("ولتاژ باطری"),
                     ups_serial=row.get("شماره سریال UPS"),
@@ -122,12 +225,6 @@ def upload_excel(request):
     else:
         form = UploadFileForm()
     return render(request, 'branches/upload_excel.html', {'form': form})
-
-
-
-import openpyxl
-from django.http import HttpResponse
-from .models import Branch
 
 
 def download_template(request):
@@ -156,6 +253,15 @@ def export_to_excel(request):
         battery_models = ", ".join([str(bm) for bm in branch.battery_model.all()])
         ups_brands = ", ".join([str(ub) for ub in branch.ups_brand.all()])
 
+        # تبدیل jDateField به رشته برای اکسل
+        install_date_str = None
+        if branch.install_date:
+            install_date_str = date2jalali(branch.install_date).strftime('%Y/%m/%d')
+
+        last_battery_installed_date_str = None
+        if branch.last_battery_installed_date:
+            last_battery_installed_date_str = date2jalali(branch.last_battery_installed_date).strftime('%Y/%m/%d')
+
         ws.append([
             branch.name,
             branch.branch_code,
@@ -165,8 +271,8 @@ def export_to_excel(request):
             ups_brands,
             branch.address,
             branch.phone,
-            branch.install_date,
-            branch.last_battery_installed_date,
+            install_date_str,  # استفاده از رشته شمسی
+            last_battery_installed_date_str,  # استفاده از رشته شمسی
             branch.ups_power,
             branch.charge_duration,
             branch.ups_serial,
@@ -180,5 +286,3 @@ def export_to_excel(request):
     response['Content-Disposition'] = 'attachment; filename=branches.xlsx'
     wb.save(response)
     return response
-
-

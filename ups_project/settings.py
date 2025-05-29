@@ -49,18 +49,20 @@ INSTALLED_APPS = [
     'branches' ,
 
     'django_jalali' ,
+    'jalali_date',
+    'widget_tweaks',
 ]
 
 JALALI_DATE_DEFAULTS = {
-   # if change it to true then all dates of the list_display will convert to the Jalali.
-   'LIST_DISPLAY_AUTO_CONVERT': False,
+   'LIST_DISPLAY_AUTO_CONVERT': True,
    'Strftime': {
-        'date': '%y/%m/%d',
-        'datetime': '%H:%M:%S _ %y/%m/%d',
+        'date': '%Y/%m/%d',
+        'datetime': '%H:%M:%S _ %Y/%m/%d',
     },
     'Static': {
         'js': [
             'admin/js/django_jalali.min.js',
+            'admin/js/main.js',
         ],
         'css': {
             'all': [
