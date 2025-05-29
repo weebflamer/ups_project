@@ -107,8 +107,20 @@ WSGI_APPLICATION = 'ups_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bmi_db',  # نام دیتابیسی که در مرحله 2 ایجاد کردید
+        'USER': 'amir',      # نام کاربری که در مرحله 2 ایجاد کردید
+        'PASSWORD': 'amir',  # رمز عبور کاربر
+        'HOST': 'localhost',          # یا آدرس IP سرور MySQL اگر جداست
+        'PORT': '3306',               # پورت پیش‌فرض MySQL
+        'KWARGS': {
+            'charset': 'utf8mb4',
+        },
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", # توصیه شده برای MySQL
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+        },
     }
 }
 
