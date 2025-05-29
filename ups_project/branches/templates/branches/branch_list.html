@@ -1,0 +1,51 @@
+{% extends "branches/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h1 class="text-primary mb-2 mb-md-0">لیست شعب</h1>
+
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <form method="get" class="d-flex" style="max-width: 280px;">
+                <input type="text" name="q" class="form-control ms-2" placeholder="نام یا کد شعبه" value="{{ query }}">
+                <button type="submit" class="btn btn-primary">جستجو</button>
+            </form>
+            <a href="/admin/" class="btn btn-success btn-sm">ورود ادمین</a>
+            <a href="{% url 'upload_excel' %}" class="btn btn-success btn-sm">آپلود اکسل جدید</a>
+            <a href="{% url 'export_to_excel' %}" class="btn btn-success btn-sm">دریافت خروجی اکسل</a>
+            <a href="{% url 'add_branch' %}" class="btn btn-success btn-sm">افزودن شعبه جدید</a>
+
+
+        </div>
+    </div>
+
+    {% if branches %}
+        <div class="row g-3">
+            {% for branch in branches %}
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title text-primary">{{ branch.name }}</h5>
+                            <p class="card-text text-muted">کد شعبه: {{ branch.branch_code }}</p>
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'branch_detail' branch.pk %}" class="btn btn-outline-info btn-sm">نمایش</a>
+                                <a href="{% url 'edit_branch' branch.pk %}" class="btn btn-outline-primary btn-sm">ویرایش</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center">
+            نتیجه‌ای یافت نشد.
+        </div>
+    {% endif %}
+</div>
+
+</body>
+{% endblock %}
