@@ -5,6 +5,7 @@ from .views import download_template
 
 
 urlpatterns = [
+    path('', views.branch_list, name='branch_list'),
     path('branch/<int:pk>/', views.branch_detail, name='branch_detail'),
     path('branches/', views.branch_list, name='branch_list'),
     path('branches/upload/', views.upload_excel, name='upload_excel'),
