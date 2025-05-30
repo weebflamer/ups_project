@@ -7,16 +7,25 @@
 </head>
 <body class="bg-light">
 
-
 <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="mb-3">
-    <a href="{% url 'download_template' %}" class="btn btn-outline-info">
-        دانلود فایل اکسل نمونه
-    </a>
-</div>
+                <a href="{% url 'download_template' %}" class="btn btn-outline-info">
+                    دانلود فایل اکسل نمونه
+                </a>
+            </div>
             <h2 class="card-title text-center mb-4">آپلود فایل اکسل</h2>
+
+            {% if messages %}
+                <ul class="messages list-unstyled">
+                    {% for message in messages %}
+                        <li class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -26,6 +35,21 @@
                 </div>
                 <button type="submit" class="btn btn-success">آپلود</button>
             </form>
+
+            {% if errors %}
+                <div class="mt-4">
+                    <h3>خطاهای موجود در فایل اکسل:</h3>
+                    <ul class="list-group">
+                        {% for error in errors %}
+                            <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="mt-3">
+                <a href="{% url 'branch_list' %}" class="btn btn-secondary">بازگشت به لیست شعب</a>
+            </div>
         </div>
     </div>
 </div>
