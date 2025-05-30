@@ -14,7 +14,7 @@ from pathlib import Path
 
 import locale
 import sys
-
+import os
 if sys.platform.startswith('win32'):
     locale.setlocale(locale.LC_ALL, "Persian_Iran.UTF-8")
 else:
@@ -105,24 +105,25 @@ WSGI_APPLICATION = 'ups_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bmi_db',  # نام دیتابیسی که در مرحله 2 ایجاد کردید
-        'USER': 'amir',      # نام کاربری که در مرحله 2 ایجاد کردید
-        'PASSWORD': 'amir',  # رمز عبور کاربر
-        'HOST': 'localhost',          # یا آدرس IP سرور MySQL اگر جداست
-        'PORT': '3306',               # پورت پیش‌فرض MySQL
-        'KWARGS': {
-            'charset': 'utf8mb4',
-        },
+        'NAME': 'bmi_db',
+        'USER': 'amir',
+        'PASSWORD': 'amir',
+        'HOST': 'localhost',
+        'PORT': '3306',
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", # توصیه شده برای MySQL
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
             'use_unicode': True,
         },
     }
 }
+
+
 
 
 # Password validation
@@ -160,7 +161,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
