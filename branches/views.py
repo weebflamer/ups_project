@@ -369,6 +369,7 @@ def export_to_excel(request):
     ws = wb.active
     ws.title = "Branches"
 
+    # سرستون‌ها
     ws.append([
         'نام شعبه', 'کد شعبه', 'کارشناس', 'تعداد باتری', 'مدل باتری',
         'برند UPS', 'آدرس', 'تلفن', 'تاریخ نصب', 'آخرین تاریخ نصب باتری',
@@ -380,13 +381,20 @@ def export_to_excel(request):
         battery_models = ", ".join([str(bm) for bm in branch.battery_model.all()])
         ups_brands = ", ".join([str(ub) for ub in branch.ups_brand.all()])
 
+        # --- START: Modified date conversion for export ---
+        # تبدیل install_date (jmodels.jDateField) به رشته شمسی
         install_date_str = None
         if branch.install_date:
-            install_date_str = date2jalali(branch.install_date).strftime('%Y/%m/%d')
+            # Convert jdate object to string in 'YYYY/MM/DD' format
+            # branch.install_date is already a jdatetime.date object because of jmodels.jDateField
+            install_date_str = branch.install_date.strftime('%Y/%m/%d')
 
+        # تبدیل last_battery_installed_date (jmodels.jDateField) به رشته شمسی
         last_battery_installed_date_str = None
         if branch.last_battery_installed_date:
-            last_battery_installed_date_str = date2jalali(branch.last_battery_installed_date).strftime('%Y/%m/%d')
+            # Convert jdate object to string in 'YYYY/MM/DD' format
+            last_battery_installed_date_str = branch.last_battery_installed_date.strftime('%Y/%m/%d')
+        # --- END: Modified date conversion for export ---
 
         ws.append([
             branch.name,
@@ -397,8 +405,8 @@ def export_to_excel(request):
             ups_brands,
             branch.address,
             branch.phone,
-            install_date_str,
-            last_battery_installed_date_str,
+            install_date_str,  # استفاده از رشته شمسی تبدیل شده
+            last_battery_installed_date_str,  # استفاده از رشته شمسی تبدیل شده
             branch.ups_power,
             branch.charge_duration,
             branch.ups_serial,
