@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.webServer>
+    <handlers>
+      <add name="Python FastCGI" 
+      path="*" 
+      verb="*" 
+      modules="FastCgiModule" 
+      scriptProcessor="C:\Python313\python.exe|C:\Python313\Lib\site-packages\wfastcgi.py"
+      resourceType="Unspecified" 
+      requireAccess="Script" />
+    </handlers>
+  </system.webServer>
+
+  <appSettings>
+    <add key="PYTHONPATH" value="C:\inetpub\wwwroot\ups_project" />
+    <add key="WSGI_HANDLER" value="ups_project.wsgi.application" />
+    <add key="DJANGO_SETTINGS_MODULE" value="ups_project.settings" />
+  </appSettings>
+</configuration>

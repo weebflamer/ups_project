@@ -33,7 +33,7 @@ SECRET_KEY = 'django-insecure-oy*3q@5&7zxq!+)xmt9ctp@e^43h7-_bi)i4i4yiq0pa#rspm@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'ups.sys']
 
 
 # Application definition
@@ -109,20 +109,10 @@ WSGI_APPLICATION = 'ups_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bmi_db',
-        'USER': 'amir',
-        'PASSWORD': 'amir',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-            'use_unicode': True,
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 
 

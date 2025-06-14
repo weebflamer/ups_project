@@ -9,7 +9,7 @@ venv/
 .vscode/
 /db.sqlite3
 /media/
-/static/
+/staticfiles/
 
 # Django
 *.log
@@ -20,3 +20,4 @@ local_settings.py
 .Trashes
 .gitkeep
 *.sqlite3-journal
+
